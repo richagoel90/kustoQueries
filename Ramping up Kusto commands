@@ -1,0 +1,39 @@
+kusto commands
+count : give count of records
+project: yo select specific columns
+take 5 :  5 records from result
+sort: order by 
+where : where in sql
+| divide 2 conditions
+top 5 : top 5
+extend: compute derived column new column with some computation
+summarize : group by in sql ( summarize (name of column)even_count= count() by state(column on which you want to group by
+render: return result in graphical way
+case : on derived column
+extract() : gets a match f a regular expression from a text string 
+
+let LightningStorms =
+StormEvents
+| where EventType == "Lightning";
+let AvalancheStorms =
+StormEvents
+| where EventType == "Avalanche";
+LightningStorms
+| join (AvalancheStorms) on State
+| distinct State
+
+
+// creating a query which gives me event information which belongs to WaterSpout event type
+// but from that highest event organized state which do not have any damage to the property as well as crop.
+let NoDamageState=
+StormEvents
+| summarize event_count =count(), Damage_Property=sum(DamageProperty), DamageCrops=sum(DamageCrops) by State
+| where Damage_Property == 0
+| where DamageCrops ==0 
+|top 1 by event_count  desc;
+let EventsinStates = 
+StormEvents
+| where EventType=="Waterspout";  
+NoDamageState
+| join (EventsinStates) on State
+| project EventId,StartTime,EndTime,EventType,Source,State

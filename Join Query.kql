@@ -1,0 +1,15 @@
+﻿// creating a query which gives me event information which belongs to WaterSpout event type
+// but from that highest event organized state which do not have any damage to the property as well as crop.
+let NoDamageState=
+StormEvents
+| summarize event_count =count(), Damage_Property=sum(DamageProperty), DamageCrops=sum(DamageCrops) by State
+| where Damage_Property == 0
+| where DamageCrops ==0 
+|top 1 by event_count  desc;
+let EventsinStates = 
+StormEvents
+| where EventType=="Waterspout";  
+NoDamageState
+| join (EventsinStates) on State
+| project EventId,StartTime,EndTime,EventType,Source,State
+
